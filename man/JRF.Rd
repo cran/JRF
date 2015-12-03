@@ -2,8 +2,7 @@
 % Please edit documentation in R/JRF.R
 \name{JRF}
 \alias{JRF}
-\title{Joint Random Forest for the simultaneous estimation of multiple related networks
-(This file is a modified version of file RF.R contained in the R package randomForest.)}
+\title{Joint Random Forest for the simultaneous estimation of multiple related networks}
 \usage{
 JRF(x, y = NULL, xtest = NULL, ytest = NULL, ntree, sampsize,
   totsize = if (replace) ncol(x) else ceiling(0.632 * ncol(x)), mtry = if
@@ -16,21 +15,25 @@ JRF(x, y = NULL, xtest = NULL, ytest = NULL, ntree, sampsize,
   keep.inbag = FALSE, nclasses, ...)
 }
 \arguments{
-\item{x}{numeric matrix ((C by r) by n): rows correspond to predictor variables for each class and columns correspond to the maximum number of samples over classes. Missing values are not allowed.}
+\item{x}{numeric matrix with \code{C * r} rows and n columns, where \code{C} is the number of networks to estimate, \code{r} the number of predictors and \code{n} the maximum sample size across classes. Therefore, rows correspond to predictor variables for each class and columns correspond to the maximum number of samples over classes. Missing values are not allowed.}
 
-\item{y}{numeric matrix (C by n): rows correspond to response variables for each class and columns correspond to the maximum number of samples over classes. Missing values are not allowed.}
+\item{y}{numeric matrix \code{C} by \code{n}, where \code{C} is the number of networks to estimate and \code{n} the maximum sample size across classes. Therefore, rows correspond to response variables for each class and columns correspond to the maximum number of samples over classes. Missing values are not allowed.}
 
-\item{xtest}{a data frame or matrix (like x) containing predictors for the test set.}
-
-\item{ytest}{response for the test set.}
+\item{nclasses}{numeric value: the total number of classes \code{C}.}
 
 \item{ntree}{numeric value: number of trees.}
 
-\item{sampsize}{numeric vector (C by 1): number of samples for each class of data.}
+\item{sampsize}{numeric vector \code{C} by \code{1}: number of samples for each class of data.}
+
+\item{importance}{Should importance of predictors be assessed?}
 
 \item{totsize}{Max number of samples across different classes}
 
 \item{mtry}{numeric value: number of predictors to be sampled at each node.}
+
+\item{xtest}{a data frame or matrix (like x) containing predictors for the test set.}
+
+\item{ytest}{response for the test set.}
 
 \item{replace}{Should sampling of cases be done with or without replacement?}
 
@@ -43,8 +46,6 @@ JRF(x, y = NULL, xtest = NULL, ytest = NULL, ntree, sampsize,
 \item{nodesize}{Minimum size of terminal nodes.  Setting this number larger causes smaller trees to be grown (and thus take less time). Note that the default values are different for classification (1) and regression (5).}
 
 \item{maxnodes}{Maximum number of terminal nodes trees in the forest can have.  If not given, trees are grown to the maximum possible  (subject to limits by nodesize ).  If set larger than maximum possible, a warning is issued.}
-
-\item{importance}{Should importance of predictors be assessed?}
 
 \item{localImp}{Should casewise importance measure be computed?}
 
@@ -64,16 +65,13 @@ JRF(x, y = NULL, xtest = NULL, ytest = NULL, ntree, sampsize,
 
 \item{keep.inbag}{Should an n by ntree matrix be returned that keeps track of which samples are in-bag in which trees (but not how many times, if sampling with replacement)}
 
-\item{nclasses}{numeric value: the total number of classes C.}
-
 \item{...}{optional parameters to be passed to the low level function}
 }
 \value{
-out object of class JRF
+\code{out} object of class JRF
 }
 \description{
-Joint Random Forest for the simultaneous estimation of multiple related networks
-(This file is a modified version of file RF.R contained in the R package randomForest.)
+Algorithm for the simultaneous estimation of multiple related networks. This file is a modified version of function RF contained in the R package randomForest.
 }
 \examples{
 # --- Derive weighted networks via JRF
@@ -101,7 +99,7 @@ data2<-matrix(rnorm(p*n2),p,n1)       # generate data2
 # --- run JRF for each target gene
 for (j in 1:2){   # for loop over target genes
 
-  #--- create matrix (classes by max(n1,n2)) of response variable 
+  #--- create matrix (classes by max(n1,n2)) of response variable
   y<-matrix(0,2,max(n1,n2));  
   y[1,seq(1,n1)]<-as.matrix(data1[j,])
   y[2,seq(1,n2)]<-as.matrix(data2[j,])
@@ -118,4 +116,8 @@ for (j in 1:2){   # for loop over target genes
 
 }
 }
+\references{
+Petralia, F., Song, WM., Tu, Z. and Wang, P., A New Method for Joint Network Analysis Reveals Common and Different Co-Expression Patterns Among Genes and Proteins in Breast Cancer, submitted
 
+A. Liaw and M. Wiener (2002). Classification and Regression by randomForest. \emph{R News} \bold{2}, 18--22.
+}

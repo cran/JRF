@@ -2,8 +2,7 @@
 % Please edit documentation in R/importance.R
 \name{importance}
 \alias{importance}
-\title{Importance score computation for object JRF
-(This file is a modified version of file importance.R contained in the R package randomForest.)}
+\title{Importance score computation for object JRF}
 \usage{
 importance(x, scale = TRUE)
 }
@@ -13,10 +12,12 @@ importance(x, scale = TRUE)
 \item{scale}{either TRUE or FALSE}
 }
 \value{
-imp matrix of importance scores (\code{"imp"})
+\code{"imp"} return importance scores (total decrease in node impurity)
 }
 \description{
-Importance score computation for object JRF
-(This file is a modified version of file importance.R contained in the R package randomForest.)
+Importance score computation. This file is a modified version of function Importance contained in the R package randomForest.
 }
 
+\references{
+A. Liaw and M. Wiener (2002). Classification and Regression by randomForest. \emph{R News} \bold{2}, 18--22.
+}
