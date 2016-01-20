@@ -2,6 +2,7 @@
    This file is a modified version of file regTree.c contained in the R package 
    randomForest.
    
+
    Copyright (C) 2001-7 Leo Breiman, Adele Cutler and Merck & Co., Inc.
 
    This program is free software; you can redistribute it and/or

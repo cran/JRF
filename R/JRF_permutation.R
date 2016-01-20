@@ -1,6 +1,6 @@
-#' Joint Random Forest for the simultaneous estimation of multiple related networks
+#' Derive importance scores for permuted data.
 #'
-#' MAIN FUNCTION -- > JRF
+#' MAIN FUNCTION -- > JRF_permutation
 #' 
 #' INPUT
 #' 
@@ -8,8 +8,9 @@
 #' ntree        number of trees
 #' mtry         number of variables to be sampled at each node
 #' genes.name   list of gene names 
+#' perm         seed for permutation
 #' 
-#' OUTPUT: importance score of interactions
+#' OUTPUT: importance score of interactions for permuted data.
 #'
 #'
 #' OTHER FUNCTIONS -- > importance  and  JRF_onetarget
@@ -21,7 +22,10 @@
 #'                class specific tree ensemble are designed to borrow information across them. 
 #' (this file is a modified version of file randomForest contained in package randomForest, A. Liaw and M. Wiener (2002))
 #'   
-#"JRF" <-  function(X, ...)UseMethod("JRF")
+#'
+#' @export 
+#"JRF_permutation" <-  function(X, ...)UseMethod("JRF")
+
 
 
 importance <- function(x,  scale=TRUE) {
@@ -30,42 +34,42 @@ importance <- function(x,  scale=TRUE) {
   type=NULL;
   class=NULL;
   if (!inherits(x, "randomForest"))
-        stop("x is not of class randomForest")
-    classRF <- x$type != "regression"
-    hasImp <- !is.null(dim(x$importance)) || ncol(x$importance) == 1
-    hasType <- !is.null(type)
-    if (hasType && type == 1 && !hasImp)
-        stop("That measure has not been computed")
-    allImp <- is.null(type) && hasImp
-    if (hasType) {
-        if (!(type %in% 1:2)) stop("Wrong type specified")
-        if (type == 2 && !is.null(class))
-            stop("No class-specific measure for that type")
+    stop("x is not of class randomForest")
+  classRF <- x$type != "regression"
+  hasImp <- !is.null(dim(x$importance)) || ncol(x$importance) == 1
+  hasType <- !is.null(type)
+  if (hasType && type == 1 && !hasImp)
+    stop("That measure has not been computed")
+  allImp <- is.null(type) && hasImp
+  if (hasType) {
+    if (!(type %in% 1:2)) stop("Wrong type specified")
+    if (type == 2 && !is.null(class))
+      stop("No class-specific measure for that type")
+  }
+  
+  imp <- x$importance
+  if (hasType && type == 2) {
+    if (hasImp) imp <- imp[, ncol(imp), drop=FALSE]
+  } else {
+    if (scale) {
+      SD <- x$importanceSD
+      imp[, -ncol(imp)] <-
+        imp[, -ncol(imp), drop=FALSE] /
+        ifelse(SD < .Machine$double.eps, 1, SD)
     }
-    
-    imp <- x$importance
-    if (hasType && type == 2) {
-        if (hasImp) imp <- imp[, ncol(imp), drop=FALSE]
-    } else {
-        if (scale) {
-            SD <- x$importanceSD
-            imp[, -ncol(imp)] <-
-                imp[, -ncol(imp), drop=FALSE] /
-                    ifelse(SD < .Machine$double.eps, 1, SD)
-        }
-        if (!allImp) {
-            if (is.null(class)) {
-                ## The average decrease in accuracy measure:
-                imp <- imp[, ncol(imp) - 1, drop=FALSE]
-            } else {
-                whichCol <- if (classRF) match(class, colnames(imp)) else 1
-                if (is.na(whichCol)) stop(paste("Class", class, "not found."))
-                imp <- imp[, whichCol, drop=FALSE]
-            }
-        }
+    if (!allImp) {
+      if (is.null(class)) {
+        ## The average decrease in accuracy measure:
+        imp <- imp[, ncol(imp) - 1, drop=FALSE]
+      } else {
+        whichCol <- if (classRF) match(class, colnames(imp)) else 1
+        if (is.na(whichCol)) stop(paste("Class", class, "not found."))
+        imp <- imp[, whichCol, drop=FALSE]
+      }
     }
-    imp<-imp[,2]
-    imp
+  }
+  imp<-imp[,2]
+  imp
 }
 
 
@@ -467,9 +471,9 @@ importance <- function(x,  scale=TRUE) {
 
 
 # --- MAIN function
-"JRF" <-
-  function(X, ntree,mtry,genes.name) {
-
+"JRF_permutation" <-
+  function(X, ntree,mtry,genes.name,perm) {
+    
     nclasses<-length(X)
     sampsize<-rep(0,nclasses)
     
@@ -488,12 +492,13 @@ importance <- function(x,  scale=TRUE) {
     index<-seq(1,p)
     
     for (j in 1:length(genes.name)){
-
+      
       covar<-matrix(0,(p-1)*nclasses,tot)             
       y<-matrix(0,nclasses,tot)             
       
+      set.seed((perm-1)*nclasses+1)
       for (c in 1:nclasses)  {
-        y[c,seq(1,sampsize[c])]<-as.matrix(X[[c]][j,])
+        y[c,seq(1,sampsize[c])]<-as.matrix(X[[c]][j,sample(sampsize[c])])
         covar[seq((c-1)*(p-1)+1,c*(p-1)),seq(1,sampsize[c])]<-X[[c]][-j,]
       }
       
@@ -501,17 +506,15 @@ importance <- function(x,  scale=TRUE) {
       
       for (s in 1:nclasses) imp[-j,j,s]<-importance(jrf.out,scale=FALSE)[seq((p-1)*(s-1)+1,(p-1)*(s-1)+p-1)]  #- save importance score for net1
       
-      }
-      
-    # --- Derive importance score for each interaction 
-      for (s in 1:nclasses){ 
-         imp.s<-imp[,,s]; t.imp<-t(imp.s)
-         imp.final[,s]<-(imp.s[lower.tri(imp.s,diag=FALSE)]+t.imp[lower.tri(t.imp,diag=FALSE)])/2        
-      }
+    }
     
+    # --- Derive importance score for each interaction 
+    for (s in 1:nclasses){ 
+      imp.s<-imp[,,s]; t.imp<-t(imp.s)
+      imp.final[,s]<-(imp.s[lower.tri(imp.s,diag=FALSE)]+t.imp[lower.tri(t.imp,diag=FALSE)])/2        
+    }
     out<-cbind(as.character(vec1),as.character(vec2),as.data.frame(imp.final),stringsAsFactors=FALSE)
     colnames(out)<-c(paste0('gene',1:2),paste0('importance',1:nclasses))
     return(out)
     
   }
-
