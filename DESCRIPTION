@@ -1,5 +1,5 @@
 Package: JRF
-Version: 0.1-3
+Version: 0.1-4
 Date: 2015-11-17
 Title: Joint Random Forest (JRF) for the Simultaneous Estimation of
         Multiple Related Networks
@@ -17,7 +17,8 @@ Suggests: MASS
 Description: Simultaneous estimation of multiple related networks.
 License: GPL (>= 2)
 URL: https://www.r-project.org
-Packaged: 2015-12-22 17:10:10 UTC; francesca
+Packaged: 2016-10-25 15:00:45 UTC; petraf01
+NeedsCompilation: yes
 Author: Francesca Petralia Developer [aut, cre],
   Pei Wang Developer [aut],
   Zhidong Tu Developer [aut],
@@ -27,6 +28,5 @@ Author: Francesca Petralia Developer [aut, cre],
   Andy Liaw Developer [ctb],
   Matthew Wiener Developer [ctb]
 Maintainer: Francesca Petralia Developer <francesca.petralia@mssm.edu>
-NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2016-01-20 23:45:44
+Date/Publication: 2016-10-25 20:31:57

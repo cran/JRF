@@ -214,6 +214,11 @@ void regTree(double *x, double *y, int mdim, int *sampsize,int nsample, int *lDa
     Free(nodestart);
     Free(jdex);
     Free(nodepop);
+    Free(ndendl);
+    Free(nodecnt);
+    Free(nodestart);
+    Free(ndend);
+      
 }
 
 
@@ -406,6 +411,9 @@ void findBestSplit(double *x, int *jdex, double *y, int mdim, int nsample,
     Free(yl);
     Free(xt);
     Free(ut);
+    Free(critvar);
+    Free(critmax);  
+    Free(ubestt);
 }
 
 void zeroInt(int *x, int length) {

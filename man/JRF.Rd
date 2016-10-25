@@ -7,7 +7,7 @@
 JRF(X, ntree, mtry,genes.name)
 }
 \arguments{
-\item{X}{List object containing expression data for each class, \code{X=list(x_1,x_2, ... )} where \code{x_j} is a \code{(p x n_j)} matrix with rows corresponding to genes and columns to samples. Rows need to be the same across objects, while samples can vary. Missing values are not allowed.}
+\item{X}{List object containing expression data for each class, \code{X=list(x_1,x_2, ... )} where \code{x_j} is a \code{(p x n_j)} matrix with rows corresponding to genes and columns to samples. Missing values are not allowed.}
 
 \item{ntree}{numeric value: number of trees.}
 
@@ -17,7 +17,7 @@ JRF(X, ntree, mtry,genes.name)
 
 }
 \value{
-\code{out} importance score of interactions for all classes, rows correspond to interactions. The first two columns contain gene names for each interaction while the remaining columns correspond to different classes. 
+A matrix with \code{I} rows and \code{C + 2} columns where \code{I} is the total number of gene-gene interactions and \code{C} is the number of classes. The first two columns contain gene names for each interaction while the remaining columns contain importance scores for different classes. 
 }
 \description{
 Algorithm for the simultaneous estimation of multiple related networks. Some of the functions utilized are a modified version of functions contained in the R package randomForest (A. Liaw and M. Wiener, 2002). 

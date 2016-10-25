@@ -1,11 +1,11 @@
-\name{JRF_permutation}
-\alias{JRF_permutation}
-\title{Derive importance scores for permuted data.}
+\name{Run_permutation}
+\alias{Run_permutation}
+\title{Derive importance scores for M permuted data sets.}
 \usage{
-JRF_permutation(X, ntree, mtry,genes.name,perm)
+Run_permutation(X, ntree, mtry,genes.name,M)
 }
 \arguments{
-\item{X}{List object containing expression data for each class, \code{X=list(x_1,x_2, ... )} where \code{x_j} is a \code{(p x n_j)} matrix with rows corresponding to genes and columns to samples. Missing values are not allowed.}
+\item{X}{List object containing expression data for each class, \code{X=list(x_1,x_2, ... )} where \code{x_j} is a \code{(p x n_j)} matrix with rows corresponding to genes and columns to samples. Rows need to be the same across objects, while samples can vary. Missing values are not allowed.}
 
 \item{ntree}{numeric value: number of trees.}
 
@@ -13,14 +13,14 @@ JRF_permutation(X, ntree, mtry,genes.name,perm)
 
 \item{genes.name}{vector containing genes name. The order needs to match the rows of \code{x_j}.}
 
-\item{perm}{integer: seed for permutation.}
+\item{M}{integer: total number of permutations.}
 
 }
 \value{
-A matrix with \code{I} rows and \code{C} columns with \code{I} being the number of total interactions and \code{C} the number of classes. Element \code{(i,k)} corresponds to the importance score for interaction \code{i} under class \code{k}. 
+A three dimensional matrix (\code{I} x \code{M} x \code{C}) with \code{I} being the number of total interactions, \code{M} the number of permutations and \code{C} the number of classes. Element \code{(i,j,k)} corresponds to the importance score for interaction \code{i}, permuted data \code{j} and class \code{k}. 
 }
 \description{
-This function computes importance score for one permuted data set. Sample labels of target genes are randomly permuted and JRF is implemented. Resulting importance scores can be used to derive an estimate of FDR.  
+This function computes importance score for \code{M} permuted data sets. Sample labels of target genes are randomly permuted and JRF is implemented. Resulting importance scores can be used to derive an estimate of FDR.  
 }
 \examples{
 
@@ -36,6 +36,7 @@ This function computes importance score for one permuted data set. Sample labels
  
  data1<-matrix(rnorm(p*n1),p,n1)       # generate data1
  data2<-matrix(rnorm(p*n2),p,n1)       # generate data2
+ M=5; 
  
    # --- Standardize variables to mean 0 and variance 1
    
@@ -44,7 +45,7 @@ This function computes importance score for one permuted data set. Sample labels
    
    # --- Run JRF and obtain importance score of interactions for each class
    
-  out<-JRF_permutation(list(data1,data2),mtry=round(sqrt(p-1)),ntree=1000,genes.name,perm)
+  out<-Run_permutation(list(data1,data2),mtry=round(sqrt(p-1)),ntree=1000,genes.name,M)
 
 }
 \references{

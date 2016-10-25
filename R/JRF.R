@@ -21,7 +21,7 @@
 #'                class specific tree ensemble are designed to borrow information across them. 
 #' (this file is a modified version of file randomForest contained in package randomForest, A. Liaw and M. Wiener (2002))
 #'   
-#"JRF" <-  function(X, ...)UseMethod("JRF")
+#' "JRF" <-  function(X, ...)UseMethod("JRF")
 
 
 importance <- function(x,  scale=TRUE) {
@@ -73,7 +73,6 @@ importance <- function(x,  scale=TRUE) {
 
 "JRF_onetarget" <-
   function(x, y=NULL,  xtest=NULL, ytest=NULL, ntree,
-           sampsize,              
            totsize = if (replace) ncol(x) else ceiling(.632*ncol(x)),
            mtry=if (!is.null(y) && !is.factor(y))
              max(floor(nrow(x)/3), 1) else floor(sqrt(nrow(x))),
@@ -84,9 +83,11 @@ importance <- function(x,  scale=TRUE) {
            proximity, oob.prox=proximity,
            norm.votes=TRUE, do.trace=FALSE,
            keep.forest=!is.null(y) && is.null(xtest), corr.bias=FALSE,
-           keep.inbag=FALSE, nclasses, ...) {
+           keep.inbag=FALSE, purity, ...) {
     
+    sampsize=c(0,0)
     ww=1/sampsize;
+    nclasses=2;
     nclass=mylevels=ipi=sw=NULL
     addclass <- is.null(y)
     classRF <- addclass || is.factor(y)
@@ -96,7 +97,7 @@ importance <- function(x,  scale=TRUE) {
     if (classRF && !addclass && length(unique(y)) < 2)
       stop("Need at least two classes to do classification.")
     
-    n <- ncol(y)           # number of samples
+    n <-totsize<- ncol(x)           # number of samples
     p <- nrow(x)/nclasses  # number of variables
     
     if (n == 0) stop("data (x) has 0 rows")
@@ -206,8 +207,9 @@ importance <- function(x,  scale=TRUE) {
       rfout <- .C("classRF",
                   x = x,
                   xdim = as.integer(c(p, n)),
-                  y = as.integer(y),
+                  y = as.integer(y), 
                   nclass = as.integer(nclass),
+                  purity=as.double(purity),
                   ncat = as.integer(ncat),
                   maxcat = as.integer(maxcat),
                   sampsize = as.integer(sampsize),
@@ -354,9 +356,9 @@ importance <- function(x,  scale=TRUE) {
       
       rfout <- .C("regRF",
                   x,
-                  y, ww,
+                  y, ww,as.double(purity),
                   as.integer(c(totsize, p)),
-                  sampsize=as.integer(sampsize), as.integer(totsize),
+                  as.integer(totsize),
                   as.integer(nodesize),
                   as.integer(nrnodes),
                   as.integer(ntree),
@@ -475,7 +477,7 @@ importance <- function(x,  scale=TRUE) {
     
     for (j in 1:nclasses) sampsize[j]<-dim(X[[j]])[2]
     
-    totsize<-tot<-max(sampsize);
+    tot<-max(sampsize);
     p<-dim(X[[1]])[1];
     imp<-array(0,c(p,length(genes.name),nclasses))
     
@@ -512,6 +514,5 @@ importance <- function(x,  scale=TRUE) {
     out<-cbind(as.character(vec1),as.character(vec2),as.data.frame(imp.final),stringsAsFactors=FALSE)
     colnames(out)<-c(paste0('gene',1:2),paste0('importance',1:nclasses))
     return(out)
-    
   }
 

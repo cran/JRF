@@ -513,8 +513,8 @@ importance <- function(x,  scale=TRUE) {
       imp.s<-imp[,,s]; t.imp<-t(imp.s)
       imp.final[,s]<-(imp.s[lower.tri(imp.s,diag=FALSE)]+t.imp[lower.tri(t.imp,diag=FALSE)])/2        
     }
-    out<-cbind(as.character(vec1),as.character(vec2),as.data.frame(imp.final),stringsAsFactors=FALSE)
-    colnames(out)<-c(paste0('gene',1:2),paste0('importance',1:nclasses))
+    out<-as.data.frame(imp.final)
+    colnames(out)<-paste0('importance',1:nclasses)
     return(out)
     
   }

@@ -2,5 +2,7 @@
 
 export(JRF)
 export(JRF_permutation)
+export(Run_permutation)
+export(JRF_network)
 useDynLib(JRF, regRF, .registration = TRUE)
 importFrom("stats", "var")
